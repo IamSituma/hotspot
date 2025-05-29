@@ -1,4 +1,3 @@
-<!-- public/verify.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,10 +100,15 @@
       const storedOTP = localStorage.getItem('currentOTP');
       
       verifyButton.disabled = true;
-      verifyButton.textContent = 'Verifying...';      if (otpValue === storedOTP) {
+      verifyButton.textContent = 'Verifying...';        if (otpValue === storedOTP) {
+        // Store verification status and phone in both cookie and localStorage
+        document.cookie = 'isPhoneVerified=true; path=/';
+        document.cookie = `verifiedPhone=${localStorage.getItem('phone')}; path=/`;
+        localStorage.setItem('isPhoneVerified', 'true');
+        localStorage.setItem('verifiedPhone', localStorage.getItem('phone'));
         // Redirect to Google after successful verification
         window.location.href = 'https://google.com';
-      } else {
+      }else {
         alert('Invalid OTP. Please try again.');
         verifyButton.disabled = false;
         verifyButton.textContent = 'Access Internet';
