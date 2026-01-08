@@ -40,9 +40,9 @@ A captive portal page for SprintUG WiFi access with phone verification via SMS.
 
 ## SMS API Configuration
 
-The application uses the EgoSMS API for sending SMS messages. By default, it runs in **live mode** for production use.
+The application uses the EgoSMS JSON API for sending SMS messages. By default, it runs in **live mode** for production use.
 
-- **Live Mode** (Default): Uses `https://www.egosms.co/api/v1/plain/` for real SMS sending
+- **Live Mode** (Default): Uses `https://www.egosms.co/api/v1/json/` for real SMS sending
 - **Sandbox Mode**: Set `EGOSMS_SANDBOX=true` for testing with sandbox environment
 - **Fallback**: If SMS API fails, the app automatically falls back to test mode showing OTP codes directly
 
@@ -73,6 +73,9 @@ The application uses the EgoSMS API for sending SMS messages. By default, it run
 4. Get your API username and password from the dashboard
 5. Set the sender ID (maximum 11 characters)
 6. Ensure your account is active and has sufficient balance
+
+**API Method:**
+This application uses the **JSON API** method for better reliability and structured responses. The JSON API provides clearer success/failure responses compared to the HTTP method.
 
 **Troubleshooting:**
 - If you get "That user does not exist or user not active", check:
