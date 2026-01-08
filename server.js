@@ -27,77 +27,6 @@ const EGOSMS_CONFIG = {
     useSandbox: process.env.EGOSMS_SANDBOX === 'true' // Default to live mode unless explicitly set to sandbox
 };
 
-const server = http.createServer((req, res) => {
-    // Handle API routes
-    if (req.url.startsWith('/api/')) {
-        // Handle CORS preflight requests
-        if (req.method === 'OPTIONS') {
-            res.writeHead(200, {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            });
-            res.end();
-            return;
-        }
-
-        if (req.url === '/api/send-sms' && req.method === 'POST') {
-            handleSendSMS(req, res);
-            return;
-        }
-    }
-
-    let filePath = '.' + req.url;
-    if (filePath === './') {
-        filePath = './index.html';
-    }
-
-    // If this is not a public path and not verified, redirect to verify page
-    const isPublicPath = publicPaths.includes(req.url);
-    const cookies = parseCookies(req);
-    const isVerified = cookies.isPhoneVerified === 'true';
-
-    if (!isPublicPath && !isVerified) {
-        res.writeHead(302, { 'Location': '/verify.html' });
-        res.end();
-        return;
-    }
-
-    const extname = path.extname(filePath);
-    let contentType = 'text/html';
-    
-    switch (extname) {
-        case '.js':
-            contentType = 'text/javascript';
-            break;
-        case '.css':
-            contentType = 'text/css';
-            break;
-        case '.jpg':
-        case '.jpeg':
-            contentType = 'image/jpeg';
-            break;
-        case '.png':
-            contentType = 'image/png';
-            break;
-    }
-
-    fs.readFile(filePath, (error, content) => {
-        if (error) {
-            if(error.code == 'ENOENT') {
-                res.writeHead(404);
-                res.end('File not found');
-            } else {
-                res.writeHead(500);
-                res.end('Server Error: '+error.code);
-            }
-        } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content, 'utf-8');
-        }
-    });
-});
-
 // Handle SMS sending API endpoint
 function handleSendSMS(req, res) {
     let body = '';
@@ -164,7 +93,7 @@ function sendSMS(phoneNumber, message) {
         };
 
         const jsonPayload = JSON.stringify(payload);
-        const apiUrl = EGOSMS_CONFIG.useSandbox ? EGOSMS_CONFIG.sandboxUrl.replace('/plain/', '/json/') : EGOSMS_CONFIG.liveUrl.replace('/plain/', '/json/');
+        const apiUrl = EGOSMS_CONFIG.useSandbox ? EGOSMS_CONFIG.sandboxUrl : EGOSMS_CONFIG.liveUrl;
 
         console.log('SMS API URL:', apiUrl);
         console.log('SMS API Payload:', jsonPayload);
@@ -266,7 +195,76 @@ function parseCookies(req) {
     return cookies;
 }
 
-const PORT = 8080;
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Vercel serverless function export
+module.exports = (req, res) => {
+
+    // Handle API routes
+    if (req.url.startsWith('/api/')) {
+        // Handle CORS preflight requests
+        if (req.method === 'OPTIONS') {
+            res.writeHead(200, {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            });
+            res.end();
+            return;
+        }
+
+        if (req.url === '/api/send-sms' && req.method === 'POST') {
+            handleSendSMS(req, res);
+            return;
+        }
+    }
+
+    // Handle static file serving
+    let filePath = '.' + req.url;
+    if (filePath === './') {
+        filePath = './index.html';
+    }
+
+    // If this is not a public path and not verified, redirect to verify page
+    const isPublicPath = publicPaths.includes(req.url);
+    const cookies = parseCookies(req);
+    const isVerified = cookies.isPhoneVerified === 'true';
+
+    if (!isPublicPath && !isVerified) {
+        res.writeHead(302, { 'Location': '/verify.html' });
+        res.end();
+        return;
+    }
+
+    const extname = path.extname(filePath);
+    let contentType = 'text/html';
+
+    switch (extname) {
+        case '.js':
+            contentType = 'text/javascript';
+            break;
+        case '.css':
+            contentType = 'text/css';
+            break;
+        case '.jpg':
+        case '.jpeg':
+            contentType = 'image/jpeg';
+            break;
+        case '.png':
+            contentType = 'image/png';
+            break;
+    }
+
+    fs.readFile(filePath, (error, content) => {
+        if (error) {
+            if(error.code == 'ENOENT') {
+                res.writeHead(404);
+                res.end('File not found');
+            } else {
+                res.writeHead(500);
+                res.end('Server Error: '+error.code);
+            }
+        } else {
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(content, 'utf-8');
+        }
+    });
+};

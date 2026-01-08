@@ -46,6 +46,16 @@ The application uses the EgoSMS JSON API for sending SMS messages. By default, i
 - **Sandbox Mode**: Set `EGOSMS_SANDBOX=true` for testing with sandbox environment
 - **Fallback**: If SMS API fails, the app automatically falls back to test mode showing OTP codes directly
 
+## Deployment Ready ✅
+
+This application is now configured for **Vercel serverless deployment**:
+
+- ✅ **Serverless Functions**: Compatible with Vercel's Node.js runtime
+- ✅ **Environment Variables**: Properly configured for SMS API credentials
+- ✅ **CORS Support**: Handles cross-origin requests for production
+- ✅ **Error Handling**: Robust error handling for production environments
+- ✅ **Static File Serving**: Serves HTML, CSS, JS, and images
+
 ⚠️ **Localhost Limitations**: SMS APIs often don't work from localhost due to security restrictions. For testing real SMS sending, consider:
 
 1. **Using ngrok** to expose your localhost server:
