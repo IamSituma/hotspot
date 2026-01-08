@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" type="image/png" href="14.png"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <title>Verify OTP</title>
+</head>
+<body class="bg">  <div class="container">    <img src="Primary-01.png" class="logo"/>
+    <h3>OTP Verification</h3>
+    <img src="powered-by.png" class="bottom-logo"alt="SprintUG"/>
+    <p>A 6-digit verification code has been sent to your number <strong id="phoneDisplay"></strong></p>    <div class="otp-container">
+      <input type="text" inputmode="numeric" id="otp" maxlength="8" placeholder="00-00-00" class="otp-single-field" />
+    </div>
+    <button onclick="verifyOTP()" id="verifyButton">Access Internet</button>
+    <div id="resendContainer" style="margin: 10px 0;">
+      <span id="countdown"></span>
+      <button onclick="resendOTP()" id="resendButton" style="display: none;">Resend OTP</button>
+    </div>    <p class="terms">By connecting to SprintUG's Internet, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-info">
+        <p>For More Information: <a href="tel:0326300300" class="phone-link">0326 300300</a></p>
+                      </div>
+    </div>
+  </footer>
+
+  <script>const phone = localStorage.getItem("phone");
+    document.getElementById("phoneDisplay").textContent = phone;
+
+    const otpInput = document.getElementById('otp');
+    const countdownEl = document.getElementById('countdown');
+    const resendButton = document.getElementById('resendButton');
+    let timeLeft = 60;
+
+    // Start countdown timer
+    function startTimer() {
+      timeLeft = 60;
+      resendButton.style.display = 'none';
+      
+      const timer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = `Resend OTP in ${timeLeft} seconds`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          countdownEl.textContent = '';
+          resendButton.style.display = 'inline-block';
+        }
+      }, 1000);
+    }
+
+    // Start the initial timer
+    startTimer();    // Resend OTP function
+    function resendOTP() {
+      resendButton.disabled = true;
+      resendButton.textContent = 'Sending...';
+      
+      // Generate new test OTP
+      const newOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      localStorage.setItem('currentOTP', newOTP);
+      
+      // Show the new OTP (for testing only)
+      alert(`Test Mode: Your new OTP is ${newOTP}`);
+      
+      // Reset timer and button
+      startTimer();
+      resendButton.textContent = 'Resend OTP';
+      resendButton.disabled = false;
+    }
+      const verifyButton = document.getElementById('verifyButton');
+    verifyButton.disabled = true; // Initially disable the button
+    
+    otpInput.addEventListener('input', (e) => {
+      let value = e.target.value;
+      
+      // Remove any non-numeric characters
+      value = value.replace(/\D/g, '');
+      
+      // Format with hyphens after every 2 digits
+      if (value.length > 0) {
+        let formatted = '';
+        for (let i = 0; i < value.length && i < 6; i++) {
+          if (i > 0 && i % 2 === 0) {
+            formatted += '-';
+          }
+          formatted += value[i];
+        }
+        value = formatted;
+      }
+      
+      // Update the input value
+      e.target.value = value;
+      verifyButton.disabled = value.length !== 8; // Including hyphens
+    });    function verifyOTP() {
+      const otpValue = otpInput.value.replace(/\D/g, '');
+      const storedOTP = localStorage.getItem('currentOTP');
+      
+      verifyButton.disabled = true;
+      verifyButton.textContent = 'Verifying...';        if (otpValue === storedOTP) {
+        // Store verification status and phone in both cookie and localStorage
+        document.cookie = 'isPhoneVerified=true; path=/';
+        document.cookie = `verifiedPhone=${localStorage.getItem('phone')}; path=/`;
+        localStorage.setItem('isPhoneVerified', 'true');
+        localStorage.setItem('verifiedPhone', localStorage.getItem('phone'));
+        // Redirect to Google after successful verification
+        window.location.href = 'https://google.com';
+      }else {
+        alert('Invalid OTP. Please try again.');
+        verifyButton.disabled = false;
+        verifyButton.textContent = 'Access Internet';
+      }
+    }
+  </script>
+</body>
+</html>

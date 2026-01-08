@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" type="image/png" href="14.png"/>
+  <title>1420 Wifi Access</title>
+</head>
+<body class="bg">  <div class="container">    <img src="Primary-01.png" class="logo"/>
+    <h3>Secure Access Required</h3>
+    <img src="powered-by.png" class="bottom-logo"alt="SprintUG"/>
+    <p>To connect to the internet, enter your mobile number. We'll send you a one-time password (OTP).</p>
+    <input type="tel" id="phone" placeholder="Enter your Phone Number (07XX-XXX-XXX)" maxlength="12" inputmode="numeric" oninput="validatePhone(this)" />
+    <button onclick="sendOTP()" id="otpButton" disabled>Request OTP</button>
+    <p class="terms">By connecting to SprintUG's Internet, you agree to our <a href="#" onclick="showTermsModal(); return false;">Terms of Service</a> and <a href="#" onclick="showPrivacyModal(); return false;">Privacy Policy</a></p>
+  </div>  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-info">
+        <p>For More Information: <a href="tel:0326300300" class="phone-link">0326 300300</a></p>
+                        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="termsModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeTermsModal()">&times;</span>
+      <h2 class="modal-title">Terms of Service</h2>
+      <div class="modal-body">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing and using SprintUG's WiFi service, you agree to be bound by these Terms of Service.</p>
+        
+        <h3>2. Service Usage</h3>
+        <p>The WiFi service is provided for personal use and must not be used for any illegal activities or in violation of any applicable laws.</p>
+        
+        <h3>3. User Responsibilities</h3>
+        <p>Users are responsible for maintaining the confidentiality of their access credentials and any activities conducted through their connection.</p>
+        
+        <h3>4. Limitations of Service</h3>
+        <p>SprintUG reserves the right to monitor usage, limit bandwidth, and terminate access for violation of these terms.</p>
+        
+        <h3>5. Privacy</h3>
+        <p>Use of this service is subject to our Privacy Policy. We collect and process data in accordance with applicable laws.</p>
+      </div>
+    </div>
+  </div>
+
+    <div id="privacyModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closePrivacyModal()">&times;</span>
+      <h2 class="modal-title">Privacy Policy</h2>
+      <div class="modal-body">
+        <h3>1. Information Collection</h3>
+        <p>We collect information necessary to provide you with WiFi access, including your phone number and device information.</p>
+        
+        <h3>2. Use of Information</h3>
+        <p>Your information is used solely for authentication, service improvement, and security purposes.</p>
+        
+        <h3>3. Data Protection</h3>
+        <p>We implement security measures to protect your personal information from unauthorized access or disclosure.</p>
+        
+        <h3>4. Data Sharing</h3>
+        <p>We do not sell or share your personal information with third parties except as required by law.</p>
+        
+        <h3>5. Your Rights</h3>
+        <p>You have the right to access, correct, or request deletion of your personal information.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    function validatePhone(input) {
+      // remove non-digit characters
+      let value = input.value.replace(/\D/g, '');
+      
+      // perfom check for valid prefixes
+      const validPrefixes = ['077', '076', '070', '074', '078', '075'];
+      const prefix = value.substring(0, 3);
+      
+      // If we have 3 or more digits and the prefix is invalid, reset to empty
+      if (value.length >= 3 && !validPrefixes.includes(prefix)) {
+        value = '';
+        input.setCustomValidity("Invalid Phone Number");
+        input.reportValidity();
+      }
+      
+      // Format with hyphens (07XX-XXX-XXX)
+      if (value.length > 4) {
+        value = value.slice(0, 4) + '-' + value.slice(4);
+      }
+      if (value.length > 8) {
+        value = value.slice(0, 8) + '-' + value.slice(8);
+      }
+        // Update input value
+      input.value = value;
+      
+      // Enable/disable button based on valid phone number
+      const button = document.getElementById('otpButton');
+      button.disabled = value.length !== 12; // Including hyphens
+      const numberOnly = value.replace(/\D/g, '');
+      const isValid = numberOnly.length === 10 && validPrefixes.includes(numberOnly.substring(0, 3));
+      const otpButton = document.getElementById('otpButton');
+      
+      // Update button state
+      otpButton.disabled = !isValid;
+      otpButton.style.opacity = isValid ? '1' : '0.5';
+      otpButton.style.cursor = isValid ? 'pointer' : 'not-allowed';
+
+      // Show error message if number is invalid after typing
+      if (value.length > 0) {
+        if (!validPrefixes.includes(numberOnly.substring(0, 3)) && numberOnly.length >= 3) {
+          input.setCustomValidity("Invalid Phone Number");
+          input.reportValidity();
+        } else if (numberOnly.length < 10) {
+          input.setCustomValidity("Please enter a complete 10-digit phone number");
+          input.reportValidity();
+        } else if (numberOnly.length > 10) {
+          input.setCustomValidity("Phone number cannot be more than 10 digits");
+          input.reportValidity();
+        } else {
+          input.setCustomValidity("");
+        }
+      } else {
+        input.setCustomValidity("");
+      }
+    }
+
+    async function sendOTP() {
+      const phoneInput = document.getElementById('phone');
+      const phoneNumber = phoneInput.value.replace(/\D/g, '');
+
+      // Format phone number with country code if not present
+      const formattedPhone = phoneNumber.startsWith('256') ? phoneNumber : `256${phoneNumber}`;
+
+      // Disable button and show loading state
+      const button = document.getElementById('otpButton');
+      button.disabled = true;
+      button.textContent = 'Sending...';
+
+      // Store phone number
+      localStorage.setItem('phone', phoneInput.value);
+
+      try {
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        localStorage.setItem('currentOTP', otp);
+
+        // Send SMS via API
+        const response = await fetch('/api/send-sms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: formattedPhone,
+            message: `Your SprintUG WiFi verification code is: ${otp}`
+          })
+        });
+
+        let result;
+        try {
+          result = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse API response:', parseError);
+          throw new Error('SMS service returned invalid response. Please try again.');
+        }
+
+        if (result.success) {
+          alert('OTP sent successfully! Check your phone.');
+          window.location.href = 'verify.html';
+        } else {
+          throw new Error(result.error || 'Failed to send SMS');
+        }
+
+      } catch (error) {
+        console.error('SMS sending failed:', error);
+        alert(`Failed to send SMS: ${error.message}. Using test mode instead.`);
+
+        // Fallback to test mode
+        const testOTP = localStorage.getItem('currentOTP');
+        alert(`Test Mode: Your OTP is ${testOTP}`);
+        window.location.href = 'verify.html';
+      } finally {
+        // Re-enable button
+        const button = document.getElementById('otpButton');
+        button.disabled = false;
+        button.textContent = 'Request OTP';
+      }
+    }
+
+    // Terms Modal Functions
+    function showTermsModal() {
+      const modal = document.getElementById('termsModal');
+      modal.classList.add('show');
+      
+      // Close when clicking outside the modal
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          closeTermsModal();
+        }
+      }
+    }
+
+    function closeTermsModal() {
+      const modal = document.getElementById('termsModal');
+      modal.classList.remove('show');
+    }
+
+    // Privacy Policy Modal Functions
+    function showPrivacyModal() {
+      const modal = document.getElementById('privacyModal');
+      modal.classList.add('show');
+      
+      // Close when clicking outside the modal
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          closePrivacyModal();
+        }
+      }
+    }
+
+    function closePrivacyModal() {
+      const modal = document.getElementById('privacyModal');
+      modal.classList.remove('show');
+    }
+  </script>
+</body>
+</html>
