@@ -11,11 +11,5 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ],
-  "env": {
-    "EGOSMS_USERNAME": "@egosms_username",
-    "EGOSMS_PASSWORD": "@egosms_password",
-    "EGOSMS_SENDER": "@egosms_sender",
-    "EGOSMS_SANDBOX": "@egosms_sandbox"
-  }
+  ]
 }
