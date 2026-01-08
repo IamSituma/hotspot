@@ -22,16 +22,18 @@ body.bg::before {
 
 /* Ensure container stays above overlay */
 .container {
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
   background: #ffffffbd;
   color: black;
   max-width: 450px;
-  margin: 8% auto;
-  padding: 20px;  
+  padding: 20px;
   border-radius: 5px;
   text-align: center;
-  min-height: 400px;  
+  min-height: 400px;
 }
 
 .logo {
@@ -49,7 +51,7 @@ p {
   margin: 2px auto;  
   max-width: 90%;   
   word-wrap: break-word;  
-  font-size: 15px;  
+  font-size: 16px;  
 }
 
 input {
@@ -59,7 +61,8 @@ input {
   border-radius: 8px;
   border: 1px solid #ccc;
   text-align: center;
-  font-size: 15px;
+  font-size: 18px;
+  font-weight: 600;
   line-height: 20px;
   max-width: 400px;
   height: 48px;
@@ -83,12 +86,14 @@ button {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  max-width: 400px;  
+  max-width: 400px;
+  font-weight: 800;
+  font-family: 'Inter', sans-serif;
 }
 
 .terms {
   margin-top: 5px;  
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;  
 }
 
@@ -120,6 +125,9 @@ button {
   padding: 5px 10px;
   text-decoration: underline;
   transition: opacity 0.2s ease;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+
 }
 
 #resendButton:disabled {

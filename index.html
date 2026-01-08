@@ -123,25 +123,61 @@
       }
     }
 
-    function sendOTP() {
+    async function sendOTP() {
       const phoneInput = document.getElementById('phone');
       const phoneNumber = phoneInput.value.replace(/\D/g, '');
-      
+
       // Format phone number with country code if not present
       const formattedPhone = phoneNumber.startsWith('256') ? phoneNumber : `256${phoneNumber}`;
-      
+
       // Disable button and show loading state
       const button = document.getElementById('otpButton');
       button.disabled = true;
-      button.textContent = 'Sending...';      // Store phone number and simulate OTP sending
+      button.textContent = 'Sending...';
+
+      // Store phone number
       localStorage.setItem('phone', phoneInput.value);
-      
-      // For testing: generate a simple 6-digit OTP
-      const testOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      localStorage.setItem('currentOTP', testOTP);
-      
-      alert(`Test Mode: Your OTP is ${testOTP}`);
-      window.location.href = 'verify.html';
+
+      try {
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        localStorage.setItem('currentOTP', otp);
+
+        // Send SMS via API
+        const response = await fetch('/api/send-sms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: formattedPhone,
+            message: `Your SprintUG WiFi verification code is: ${otp}`
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('OTP sent successfully! Check your phone.');
+          window.location.href = 'verify.html';
+        } else {
+          throw new Error(result.error || 'Failed to send SMS');
+        }
+
+      } catch (error) {
+        console.error('SMS sending failed:', error);
+        alert(`Failed to send SMS: ${error.message}. Using test mode instead.`);
+
+        // Fallback to test mode
+        const testOTP = localStorage.getItem('currentOTP');
+        alert(`Test Mode: Your OTP is ${testOTP}`);
+        window.location.href = 'verify.html';
+      } finally {
+        // Re-enable button
+        const button = document.getElementById('otpButton');
+        button.disabled = false;
+        button.textContent = 'Request OTP';
+      }
     }
 
     // Terms Modal Functions
