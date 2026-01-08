@@ -78,21 +78,26 @@ This application is now configured for **Vercel serverless deployment**:
 
 **For Production (Live):**
 1. Visit [https://www.egosms.co](https://www.egosms.co)
-2. Create an account and verify your email
-3. Add funds to your account (SMS sending requires credits)
-4. Get your API username and password from the dashboard
-5. Set the sender ID (maximum 11 characters)
-6. Ensure your account is active and has sufficient balance
+2. **Create an account and verify your email**
+3. **⚠️ IMPORTANT: Contact EgoSMS support to activate your account**
+4. **Add funds/credits to your account** (SMS sending requires balance)
+5. Get your API username and password from the dashboard
+6. Set the sender ID (maximum 11 characters)
 
 **API Method:**
 This application uses the **JSON API** method for better reliability and structured responses. The JSON API provides clearer success/failure responses compared to the HTTP method.
 
+**Account Activation Required:**
+- **New accounts need manual activation** by EgoSMS support
+- **Credits must be added** before SMS sending works
+- **Contact**: support@egosms.co or visit their website
+
 **Troubleshooting:**
 - If you get "That user does not exist or user not active", check:
-  - Account verification status
-  - Account balance/credits
-  - Correct username and password
-  - Account activation status
+  - ✅ Account verification status
+  - ✅ Account balance/credits
+  - ✅ Correct username and password
+  - ✅ **Contact EgoSMS support for account activation**
 
 ### API Documentation
 
